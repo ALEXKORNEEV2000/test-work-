@@ -1,0 +1,43 @@
+import java.util.Scanner;
+
+public class CurrencyConverter {
+
+    // Задаем фиксированные курсы обмена как константы
+    public static final double USD_TO_EUR = 0.85;
+    public static final double USD_TO_GBP = 0.75;
+    public static final double USD_TO_JPY = 110.0;
+    public static final double USD_TO_RUB = 75.0;
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        // Запрашиваем у пользователя сумму в долларах
+        System.out.print("Enter the amount in USD: ");
+        double amountInUSD = scanner.nextDouble();
+
+        // Выводим результат конвертации в другие валюты
+        System.out.println("Amount in EUR: " + convertToEur(amountInUSD));
+        System.out.println("Amount in GBP: " + convertToGbp(amountInUSD));
+        System.out.println("Amount in JPY: " + convertToJpy(amountInUSD));
+        System.out.println("Amount in RUB: " + convertToRub(amountInUSD));
+
+        scanner.close(); // Закрываем сканер
+    }
+
+    // Методы для конвертации в другие валюты
+    public static double convertToEur(double amountInUSD) {
+        return amountInUSD * USD_TO_EUR;
+    }
+
+    public static double convertToGbp(double amountInUSD) {
+        return amountInUSD * USD_TO_GBP;
+    }
+
+    public static double convertToJpy(double amountInUSD) {
+        return amountInUSD * USD_TO_JPY;
+    }
+
+    public static double convertToRub(double amountInUSD) {
+        return amountInUSD * USD_TO_RUB;
+    }
+}
