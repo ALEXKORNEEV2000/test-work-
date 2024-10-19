@@ -1,0 +1,202 @@
+Задание №1. Игра «Виселица» 
+package oooo;
+abstract class Species {
+    protected String name;
+    protected String type; // "Plant" или "Animal"
+
+    public Species(String name, String type) {
+        this.name = name;
+        this.type = type;
+    }
+
+    public String getName() {
+        return name; // Возвращает имя вида
+    }
+
+    public String getType() {
+        return type; // Возвращает тип вида
+    }
+
+    // Метод для взаимодействия с другим видом (будет переопределен в дочерних классах)
+    public abstract void interact(Species other);
+}
+
+public class Plant extends Species {
+    public Plant(String name) {
+        super(name, "Plant"); // Устанавливаем тип как "Растение"
+    }
+
+    @Override
+    public void interact(Species other) {
+        if (other.getType().equals("Animal")) {
+            System.out.println(this.name + " was eaten by " + other.getName()); // Растение съедено животным
+        } else {
+            System.out.println(this.name + " is coexisting with " + other.getName()); // Растение сосуществует с другим растением
+        }
+    }
+}
+
+public class Animal extends Species {
+    public Animal(String name) {
+        super(name, "Animal"); // Устанавливаем тип как "Животное"
+    }
+
+    @Override
+    public void interact(Species other) {
+        if (other.getType().equals("Plant")) {
+            System.out.println(this.name + " is eating " + other.getName()); // Животное ест растение
+        } else {
+            System.out.println(this.name + " is interacting with " + other.getName()); // Животное взаимодействует с другим видом
+        }
+    }
+}
+package oooo;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+
+public class Ecosystem {
+    private List<Species> speciesList; // Список всех видов в экосистеме
+
+    public Ecosystem() {
+        this.speciesList = new ArrayList<>();
+    }
+
+    // Метод для добавления вида в экосистему
+    public void addSpecies(Species species) {
+        speciesList.add(species);
+    }
+
+    // Метод для нахождения вида по имени
+    private Species findSpeciesByName(String name) {
+        for (Species species : speciesList) {
+            if (species.getName().equalsIgnoreCase(name)) { // Сравнение имен без учета регистра
+                return species;
+            }
+        }
+        return null; // Если вид не найден, возвращаем null
+    }
+
+    // Метод для взаимодействия между двумя видами
+    public void interactSpecies(String speciesName1, String speciesName2) {
+        Species species1 = findSpeciesByName(speciesName1); // Находим первый вид
+        Species species2 = findSpeciesByName(speciesName2); // Находим второй вид
+
+        if (species1 != null && species2 != null) {
+            species1.interact(species2); // Взаимодействие между видами
+        } else {
+            System.out.println("One or both species not found."); // Сообщение об ошибке, если вид не найден
+        }
+    }
+
+    // Сохранение экосистемы в текстовый файл
+    public void saveToFile(String filename) throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) { // Используем try-with-resources
+            for (Species species : speciesList) {
+                writer.write(species.getType() + ": " + species.getName()); // Записываем тип и имя вида
+                writer.newLine(); // Переход на новую строку
+            }
+        }
+    }
+
+    // Загрузка экосистемы из текстового файла
+    public void loadFromFile(String filename) throws IOException {
+        try (BufferedReader reader = new BufferedReader(new FileReader(filename))) { // Используем try-with-resources
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] data = line.split(": "); // Разделяем строку на тип и имя вида
+                if (data.length == 2) { // Проверка правильного формата строки
+                    if (data[0].equalsIgnoreCase("Plant")) {
+                        addSpecies(new Plant(data[1])); // Добавляем растение
+                    } else if (data[0].equalsIgnoreCase("Animal")) {
+                        addSpecies(new Animal(data[1])); // Добавляем животное
+                    }
+                }
+            }
+        }
+    }
+
+    // Метод для отображения текущей экосистемы
+    public void showEcosystem() {
+        if (speciesList.isEmpty()) {
+            System.out.println("The ecosystem is empty."); // Если экосистема пуста
+        } else {
+            for (Species species : speciesList) {
+                System.out.println(species.getType() + ": " + species.getName()); // Выводим тип и имя вида
+            }
+        }
+    }
+}
+package oooo;
+import java.io.IOException;
+import java.util.Scanner;
+
+public class Mainn {
+    public static void main(String[] args) {
+        Ecosystem ecosystem = new Ecosystem(); // Создаем объект экосистемы
+        Scanner scanner = new Scanner(System.in); // Создаем сканер для пользовательского ввода
+
+        // Основной цикл программы
+        while (true) {
+            System.out.println("1. Add Plant (Добавить растение)");
+            System.out.println("2. Add Animal (Добавить животное)");
+            System.out.println("3. Interact Species (Взаимодействие между видами)");
+            System.out.println("4. Show Ecosystem (Показать экосистему)");
+            System.out.println("5. Save to File (Сохранить в файл)");
+            System.out.println("6. Load from File (Загрузить из файла)");
+            System.out.println("7. Exit (Выход)");
+            System.out.print("Choose an option: "); // Выберите опцию
+            int option = scanner.nextInt();
+            scanner.nextLine(); // Пропуск новой строки после числа
+
+            switch (option) {
+                case 1:
+                    System.out.print("Enter plant name: "); // Введите название растения
+                    String plantName = scanner.nextLine();
+                    ecosystem.addSpecies(new Plant(plantName)); // Добавляем растение
+                    break;
+                case 2:
+                    System.out.print("Enter animal name: "); // Введите название животного
+                    String animalName = scanner.nextLine();
+                    ecosystem.addSpecies(new Animal(animalName)); // Добавляем животное
+                    break;
+                case 3:
+                    System.out.print("Enter first species name: "); // Введите имя первого вида
+                    String species1 = scanner.nextLine();
+                    System.out.print("Enter second species name: "); // Введите имя второго вида
+                    String species2 = scanner.nextLine();
+                    ecosystem.interactSpecies(species1, species2); // Взаимодействие между видами
+                    break;
+                case 4:
+                    ecosystem.showEcosystem(); // Отобразить экосистему
+                    break;
+                case 5:
+                    System.out.print("Enter filename to save: "); // Введите имя файла для сохранения
+                    String saveFile = scanner.nextLine();
+                    try {
+                        ecosystem.saveToFile(saveFile); // Сохранение экосистемы в файл
+                        System.out.println("Ecosystem saved successfully."); // Сообщение о успешном сохранении
+                    } catch (IOException e) {
+                        System.out.println("Error saving file: " + e.getMessage()); // Сообщение об ошибке
+                    }
+                    break;
+                case 6:
+                    System.out.print("Enter filename to load: "); // Введите имя файла для загрузки
+                    String loadFile = scanner.nextLine();
+                    try {
+                        ecosystem.loadFromFile(loadFile); // Загрузка экосистемы из файла
+                        System.out.println("Ecosystem loaded successfully."); // Сообщение об успешной загрузке
+                    } catch (IOException e) {
+                        System.out.println("Error loading file: " + e.getMessage()); // Сообщение об ошибке
+                    }
+                    break;
+                case 7:
+                    System.out.println("Exiting..."); // Сообщение о выходе
+                    scanner.close(); // Закрываем сканер
+                    return;
+                default:
+                    System.out.println("Invalid option. Please try again."); // Сообщение о неправильной опции
+            }
+        }
+    }
+}
